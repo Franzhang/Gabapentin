@@ -153,7 +153,6 @@ gen GabRx = .
 replace GabRx = 1 if DrugClass == 5
 egen GabPop = max(GabRx), by(PatientGroupIDHash)
 
-
 * 3) excluding terminal patient.
 gen PallRx = .
 replace PallRx = 1 if PrescriberSpecialty == "Palliative Medicine" | PrescriberSpecialty == "Hospice"
@@ -172,6 +171,8 @@ replace PaymentType=. if PaymentType==99
 replace PaymentType=. if PaymentType==0
 replace NumOfRefillsAuth=. if NumOfRefillsAuth<0
 replace RefillCode=. if RefillCode<0
+replace Quantity=. if Quantity<=0
+replace DaysSupply=. if DaysSupply<=0
 
 
 ****** Opioid Type *****
