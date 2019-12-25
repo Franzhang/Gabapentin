@@ -1166,6 +1166,7 @@ gen DrugFormulation = substr(Drug, -3, .)
 gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"
 replace GabaStrength = "50" if GabaStrength=="G/5"
 destring GabaStrength, replace
+replace GabaStrength = 565 if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
 gen GabaDaily = GabaStrength * Quantity / DaysSupply
 * * Gabapentin starter pack. 30-Day Starter Pack: Blister package containing 78 tablets: 9 x 300 mg tablets and 69 x 600 mg tablets
 replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
@@ -1174,29 +1175,22 @@ replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 60
 summarize GabaDaily, d
 
 
-*** Saved Data: Gaba V1 **
+*** Saved Data: Gaba **
 
-
+************** copied to another file **************
+* Read the saved GabaData
 * lorenz-1 value: consumption of drug supply by top 1% of users in 4 months
 * patientid gabapentin total mg
-gen GabaTotal = GabaDose * Quantity
-bysort PatientGroupIDHash: egen GabaTotalPat = total(GabaTotal)
+* gen GabaTotal = GabaStrength * Quantity
+* bysort PatientGroupIDHash: egen GabaTotalPat = total(GabaTotal)
 
-duplicates drop PatientGroupIDHash GabaTotalPat, force
-lorenz estimate GabaTotalPat
+* duplicates drop PatientGroupIDHash GabaTotalPat, force
+* lorenz estimate GabaTotalPat
+****************copied to another file*********************
 
-
-
-** gaba commcomitant use: 30 days window as comcommitant. this is only a proxy. use month
-gen month=mofd(DateFilled)
-format month %tm
-
-** gaba co-prescribe??
-
+**************Read the saved gaba data ********
 * limit analysis on Opioids and Gabapentin.
 keep if DrugClass==0 | DrugClass==5
-** Save Gaba.v2 ***
-
 
 ** Gaba Dose Categories **
 gen GabaDoseCat = 99 if DrugClass==5
