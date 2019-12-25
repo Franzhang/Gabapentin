@@ -160,7 +160,7 @@ replace PallRx = 1 if PrescriberSpecialty == "Palliative Medicine" | PrescriberS
 egen PallPat = max(PallRx), by(PatientGroupIDHash)
 
 gen ElgPop = 1 if GabPop == 1 & PallPat != 1
-keep if ElgPop = 1
+keep if ElgPop == 1
 * 5,546,434 observations deleted. 2,202,061 records
 
 
@@ -1143,6 +1143,7 @@ replace MAT=1 if Drug=="ZUBSOLV 8.6 MG-2.1 MG TAB"
 replace MAT=1 if Drug=="ZUBSOLV 0.7 MG-0.18 MG TAB"
 
 ** MAT by ZYF.  ***
+gen DrugFormulation = substr(Drug, -3, .)
 //buprenorphine  Butrans patch is for pain
 replace MAT=0 if TherClassDesc == "Buprenorphine & Comb." & DrugFormulation=="TDM" 
 
@@ -1164,7 +1165,6 @@ replace MAT=0 if  MAT==99
 egen OUD = max(MAT), by(PatientGroupIDHash)
 
 ** gaba miligram 
-gen DrugFormulation = substr(Drug, -3, .)
 gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"
 replace GabaStrength = "50" if GabaStrength=="G/5"
 destring GabaStrength, replace
@@ -1174,7 +1174,7 @@ gen GabaDaily = GabaStrength * Quantity / DaysSupply
 replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
 
 * 642 fills have 0 DaysSupply.
-summarize GabaDaily, d m
+summarize GabaDaily, d
 
 *** Saved Data: Gaba **
 save "G:\Gabapentin\statadata\gaba_dec_mar.dta", replace
