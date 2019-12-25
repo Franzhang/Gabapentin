@@ -1160,6 +1160,9 @@ tab TherClassDesc if MAT==99
 
 replace MAT=0 if  MAT==99
 
+** Once received MAT, category this patient to MAT
+egen OUD = max(MAT), by(PatientGroupIDHash)
+
 ** gaba miligram 
 gen DrugFormulation = substr(Drug, -3, .)
 gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"
@@ -1171,7 +1174,7 @@ gen GabaDaily = GabaStrength * Quantity / DaysSupply
 replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
 
 * 642 fills have 0 DaysSupply.
-summarize GabaDaily, d
+summarize GabaDaily, d m
 
 *** Saved Data: Gaba **
 save "G:\Gabapentin\statadata\gaba_dec_mar.dta", replace

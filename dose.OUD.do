@@ -9,35 +9,39 @@ use "G:\Gabapentin\statadata\gaba_dec_mar.dta", clear
 keep if DrugClass==0 | DrugClass==5
 
 ** Gaba Dose Categories **
-gen GabaDoseCat = 99 if DrugClass==5
+gen GabaDoseCat = 9 if DrugClass==5
 
 label define GabaDoseCat 0"Low" 1"Moderate" 2 "High"
 label values GabaDoseCat GabaDoseCat
 replace GabaDoseCat = 0 if GabaDaily < 900 & GabaDaily !=.
 replace GabaDoseCat = 1 if GabaDaily >=900 & GabaDaily <1800 & GabaDaily !=.
 replace GabaDoseCat = 2 if GabaDaily >=1800 & GabaDaily !=.
-tab GabaDoseCat
-* 642 records have 0 in DaysSupply.
-replace GabaDoseCat = . if GabaDoseCat==99
+tab GabaDoseCat, m
 
+gen PrblmRx = .
+label define PrblmRx 0 "<=3600 mg" 1 ">3600 mg" 9 "DailyDose miss"
+label values PrblmRx PrblmRx
+replace PrblmRx = 0 if GabaDaily <= 3600 & GabaDaily !=.
+replace PrblmRx = 1 if GabaDaily > 3600 & GabaDaily !=.  
+replace PrblmRx = 9 if DrugClass == 5 & GabaDaily =. 
+tab PrblmRx, m         
 
-** Once received MAT, category this patient to MAT
-gen MATPat = .
-replace MATPat = 1 if MAT==1
-bysort PatientGroupIDHash (MATPat): replace MATPat = MATPat[1]
+* number of problematic claims for each patient
+recode PrblmRx (9=.)
+egen prblm_nbr = total(PrblmRx), by(PatientGroupIDHash)
+tab prblm_nbr, m
+gen Problem1 = 1 if prblm_nbr >= 2
 
+keep PatientGroupIDHash OUD Problem1
+duplicates drop
+tab OUD Problem1, chi e
 
-* patient demographics
-
-
-** need to do: Ohio Patients
-
-gen DrugFormulation = substr(Drug, -3, .)
 
 ** use alone
 keep PatientGroupIDHash DrugClass
 duplicates drop
 drop if DrugClass==.
+
 sort PatientGroupIDHash DrugClass
 by PatientGroupIDHash : gen usealone = _N
 by PatientGroupIDHash : replace usealone = _N
@@ -73,9 +77,6 @@ drop PrescriberHash
 duplicates drop
 
 
-** gaba with other drugs: how many patients
-** gaba prescribed alone
-** gaba with opioid: different MME.
 
 
 
