@@ -6,8 +6,7 @@
 use "G:\Gabapentin\statadata\gaba_dec_mar.dta", clear
 * lorenz-1 value: consumption of drug supply by top 1% of users in 4 months
 * patientid gabapentin total mg
-gen GabaTotal = GabaStrength * Quantity
-bysort PatientGroupIDHash: egen GabaTotalPat = total(GabaTotal)
+egen GabaTotalPat = total(GabaTotal), by(PatientGroupIDHash) 
 
 duplicates drop PatientGroupIDHash OUD GabaTotalPat, force
 lorenz estimate GabaTotalPat

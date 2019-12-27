@@ -3,7 +3,8 @@
 * written 2018.6.15 *
 * updated 2019.12.24 *
 * By Yifan Zhang *
-
+set more off
+log using "G:\Gabapentin\analysis\makedata.smcl", replace
 use "G:\Gabapentin\statadata\2016.10.1-2017.3.31.dta"
 
 * limite to 2016/12/1 to 2017/3/31
@@ -1169,8 +1170,12 @@ gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"
 replace GabaStrength = "50" if GabaStrength=="G/5"
 destring GabaStrength, replace
 replace GabaStrength = 565 if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
+gen GabaTotal = GabaStrength * Quantity
+label var GabaTotal "Total Dose (mg) for each Rx"
 gen GabaDaily = GabaStrength * Quantity / DaysSupply
+label var GabaDaily "Daily dose for each Rx"
 * * Gabapentin starter pack. 30-Day Starter Pack: Blister package containing 78 tablets: 9 x 300 mg tablets and 69 x 600 mg tablets
+replace GabaTotal = 44100 if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
 replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 600 MG TAB" | Drug == "GRALISE 300 MG; 600 MG TAB"
 
 * 642 fills have 0 DaysSupply.
@@ -1178,3 +1183,4 @@ summarize GabaDaily, d
 
 *** Saved Data: Gaba **
 save "G:\Gabapentin\statadata\gaba_dec_mar.dta", replace
+log close
