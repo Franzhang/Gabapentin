@@ -8,11 +8,11 @@
 set more off
 log using "G:\Gabapentin\analysis\dose.OUD.nbr2.smcl", replace
 use "G:\Gabapentin\statadata\gaba_dec_mar.dta", clear
-* limit analysis on Opioids and Gabapentin.
-keep if DrugClass==0 | DrugClass==5
+* limit analysis to Gabapentin.
+keep if DrugClass==5
 
 ** Gaba Dose Categories **
-gen GabaDoseCat = 9 if DrugClass==5
+gen GabaDoseCat = 9
 
 label define GabaDoseCat 0"Low" 1"Moderate" 2 "High"
 label values GabaDoseCat GabaDoseCat
@@ -26,17 +26,26 @@ label define PrblmRx 0 "<=3600 mg" 1 ">3600 mg" 9 "DailyDose miss"
 label values PrblmRx PrblmRx
 replace PrblmRx = 0 if GabaDaily <= 3600 & GabaDaily !=.
 replace PrblmRx = 1 if GabaDaily > 3600 & GabaDaily !=.  
-replace PrblmRx = 9 if DrugClass == 5 & GabaDaily =. 
+replace PrblmRx = 9 if GabaDaily ==. 
 tab PrblmRx, m         
 
 * number of problematic claims for each patient
-recode PrblmRx (9=.)
-egen prblm_nbr = total(PrblmRx), by(PatientGroupIDHash)
+* manipulate missing values
+recode PrblmRx (9=0.001)
+egen prblm_nbr = total(PrblmRx), by(PatientGroupIDHash) 
 tab prblm_nbr, m
 gen Problem1 = 1 if prblm_nbr >= 2
-
+replace Problem1 = 0 if prblm_nbr < 2
+replace Problem1 = . if prblm_nbr >= 0.002 & prblm_nbr < 1
+replace Problem1 = . if prblm_nbr > 1 & prblm_nbr < 2
+tab Problem1, m
 keep PatientGroupIDHash OUD Problem1
+codebook PatientGroupIDHash
+describe
 duplicates drop
-tab OUD Problem1, chi e
+describe
+codebook PatientGroupIDHash
+tab OUD Problem1, row chi e
+tab OUD Problem1, m row chi e 
 
 log close

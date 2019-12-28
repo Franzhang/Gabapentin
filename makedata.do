@@ -18,7 +18,6 @@ drop DateWritten
 rename DateWritten_d DateWritten
 
 drop if DateFilled < td(1dec2016)
-
 gen DrugClass=99
 label define DrugClass 0"Opioids" 1"Benzodiazepine" 2"Stimulants" 3"Anti-Depression" 4"Muscle-Relaxant" 5 "Gabapentin" 99 "Others"
 label values DrugClass DrugClass
@@ -142,12 +141,11 @@ replace DrugClass=2 if Drug=="METHYLPHENIDATE  POW"
 
 replace DrugClass=5 if TherClassDesc=="Gabapentin"
 
-* 7,760,939 Rxs
+codebook PatientGroupIDHash
 * Eligible population
 * 1) Exclude Rx from veterinarians
 *    The Mandatory OARRS Registration and Requests law DOES NOT apply to veterinarians.
 drop if PrescriberSpecialty == "Veterinarian"
-* 12,444 observations deleted. 7,748,495 records.
 
 * Dataset contains only Ohio patients
 * 2) limit to patients who filled at least one gabapentin
@@ -162,8 +160,7 @@ egen PallPat = max(PallRx), by(PatientGroupIDHash)
 
 gen ElgPop = 1 if GabPop == 1 & PallPat != 1
 keep if ElgPop == 1
-* 5,546,434 observations deleted. 2,202,061 records
-
+codebook PatientGroupIDHash
 
 // clean by 0.01% rules (data entry errors)
 replace PatientAge=. if PatientAge>116
@@ -1164,6 +1161,7 @@ replace MAT=0 if  MAT==99
 
 ** Once received MAT, category this patient to MAT
 egen OUD = max(MAT), by(PatientGroupIDHash)
+replace OUD = 0 if OUD == .
 
 ** gaba miligram 
 gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"

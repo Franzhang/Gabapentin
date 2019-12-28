@@ -5,7 +5,6 @@
 * updated 2019.12.24 *
 * By Yifan Zhang *
 
-
 set more off
 log using "G:\Gabapentin\analysis\dose.OUD.rolling.smcl", replace
 use "G:\Gabapentin\statadata\gaba_dec_mar.dta", clear
@@ -13,7 +12,7 @@ use "G:\Gabapentin\statadata\gaba_dec_mar.dta", clear
 keep if DrugClass==5
 
 ** Gaba Dose Categories **
-gen GabaDoseCat = 9 if DrugClass==5
+gen GabaDoseCat = 9
 
 label define GabaDoseCat 0"Low" 1"Moderate" 2 "High"
 label values GabaDoseCat GabaDoseCat
@@ -49,6 +48,6 @@ tab Prblm, m
 
 keep PatientGroupIDHash OUD Prblm
 duplicates drop
-tab OUD Prblm, chi e
+tab OUD Prblm, row chi e
 
 log close
