@@ -162,18 +162,6 @@ gen ElgPop = 1 if GabPop == 1 & PallPat != 1
 keep if ElgPop == 1
 codebook PatientGroupIDHash
 
-// clean by 0.01% rules (data entry errors)
-replace PatientAge=. if PatientAge>116
-replace PatientAge=. if PatientAge<=0
-replace PatientSex=. if PatientSex==0
-replace PaymentType=. if PaymentType==99
-replace PaymentType=. if PaymentType==0
-replace NumOfRefillsAuth=. if NumOfRefillsAuth<0
-replace RefillCode=. if RefillCode<0
-replace Quantity=. if Quantity<=0
-replace DaysSupply=. if DaysSupply<=0
-
-
 ****** Opioid Type *****
 
 
@@ -1163,6 +1151,17 @@ replace MAT=0 if  MAT==99
 egen OUD = max(MAT), by(PatientGroupIDHash)
 replace OUD = 0 if OUD == .
 
+// clean by 0.01% rules (data entry errors)
+replace PatientAge=. if PatientAge>116
+replace PatientAge=. if PatientAge<=0
+replace PatientSex=. if PatientSex==0
+replace PaymentType=. if PaymentType==99
+replace PaymentType=. if PaymentType==0
+replace NumOfRefillsAuth=. if NumOfRefillsAuth<0
+replace RefillCode=. if RefillCode<0
+replace Quantity=. if Quantity<=0
+replace DaysSupply=. if DaysSupply<=0
+
 ** gaba miligram 
 gen GabaStrength = substr(Drug, -10, 3) if TherClassDesc == "Gabapentin"
 replace GabaStrength = "50" if GabaStrength=="G/5"
@@ -1178,6 +1177,9 @@ replace GabaDaily = 44100/DaysSupply if Drug == "GRALISE STARTER PACK 300 MG; 60
 
 * 642 fills have 0 DaysSupply.
 summarize GabaDaily, d
+tab GabaDaily
+tab GabaDaily, m
+graph box GabaDaily, saving(Gaba_boxplot, replace)
 
 *** Saved Data: Gaba **
 save "G:\Gabapentin\statadata\gaba_dec_mar.dta", replace
