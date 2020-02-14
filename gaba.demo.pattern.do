@@ -46,7 +46,7 @@ bysort PatientGroupIDHash: gen NumPharmacy = _N
 drop PharmacyHash 
 duplicates drop
 tab NumPharmacy, m
-tab NumPharmacy OUD, m
+tab NumPharmacy OUD, m col
 ranksum NumPharmacy, by(OUD)
 bysort OUD: summarize NumPharmacy, d
 ttest NumPharmacy, by(OUD)
@@ -59,7 +59,7 @@ bysort PatientGroupIDHash: gen NumPrescriber = _N
 drop PrescriberHash
 duplicates drop
 tab NumPrescriber, m
-tab NumPrescriber OUD, m 
+tab NumPrescriber OUD, m col
 ranksum NumPrescriber, by(OUD)
 bysort OUD: summarize NumPrescriber, d
 ttest NumPrescriber, by(OUD)
